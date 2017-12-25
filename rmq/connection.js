@@ -78,7 +78,7 @@ consume2 = async (connection) => {
                try {
                    let query = JSON.parse(msg.content.toString());
                    if(query.tipe!==undefined&&query.tipe===0){
-                       query.starttime=new Date().getTime();
+                       query.starttime=new Date().getTime()+1000;
                        console.log("data pengujian berhasil diambil");
                        let timeAfterQueue = new Date().getTime();
                        query.timeinqueue= (timeAfterQueue-query.starttime)/1000;
@@ -117,6 +117,8 @@ consume2 = async (connection) => {
        let timeForInsertToDatabase=(timeAfterSaveToDb-timeBeforeInsertToDatabase)/1000;
        let proccessTime=(timeAfterSaveToDb-query.starttime)/1000;
         if(query.antrian%1000===0){
+            io.emit('status', query.tag+" success saving data "+query.antrian+" to database"+", Proccess Time : " +proccessTime+", Time in Queue : "+query.timeinqueue+", Time For Saving to DB : "+timeForInsertToDatabase);
+        }else if(query.antrian<1000){
             io.emit('status', query.tag+" success saving data "+query.antrian+" to database"+", Proccess Time : " +proccessTime+", Time in Queue : "+query.timeinqueue+", Time For Saving to DB : "+timeForInsertToDatabase);
         }
         await absensiModel.updateInsertToDbTime(query.tag,query.antrian,timeForInsertToDatabase,proccessTime);
