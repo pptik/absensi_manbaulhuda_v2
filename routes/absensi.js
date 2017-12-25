@@ -118,7 +118,7 @@ router.post('/pengujian', async(req, res) => {
             let Jumlah=parseInt(query.jumlah);
             let tag=query.tag;
             let amqp = require('amqplib/callback_api');
-            let broker_uri = "amqp://pengujianabsensi:pengujianabsensi@167.205.7.226:5672/%2fpengujianabsensi?heartbeat=60000";
+            let broker_uri = "amqp://pengujianabsensi:pengujianabsensi@167.205.7.226:5672/%2fpengujianabsensi?heartbeat=600000";
 
             let exchangeName = "amq.topic";
             let countProccess=1;
