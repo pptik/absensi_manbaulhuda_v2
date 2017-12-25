@@ -78,6 +78,7 @@ consume2 = async (connection) => {
                try {
                    let query = JSON.parse(msg.content.toString());
                    if(query.tipe!==undefined&&query.tipe===0){
+                       query.starttime=new Date().getTime();
                        console.log("data pengujian berhasil diambil");
                        let timeAfterQueue = new Date().getTime();
                        query.timeinqueue= (timeAfterQueue-query.starttime)/1000;
