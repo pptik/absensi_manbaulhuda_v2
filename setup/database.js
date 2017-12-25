@@ -8,9 +8,9 @@ var url = configs.mongodb_uri;
 exports.connect = function(callback) {
     MongoClient.connect(url, {
 
-        connectTimeoutMS:600000,
-        socketTimeoutMS:60000,
-        wtimeout:60000
+        connectTimeoutMS:9000000,
+        socketTimeoutMS:9000000,
+        wtimeout:9000000
     },function(err, database) {
         if(err) {
             console.log("Connected to server failed");
