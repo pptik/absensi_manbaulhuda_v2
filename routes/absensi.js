@@ -244,6 +244,13 @@ router.get('/today/list', async(req, res) => {
         res.status(200).send({success: false, message: "Data Gagal Diambil"});
     }
 });
+router.get('/time', async(req, res) => {
+    try{
+        res.status(200).send({success: true, time:new Date().getTime()});
+    }catch (err){
+        res.status(200).send({success: false, message: "Data Gagal Diambil"});
+    }
+});
 router.post('/getby/date/noinduk', async(req, res) => {
     let query=req.body;
     let SearchString=query.SearchString;

@@ -78,12 +78,21 @@ consume2 = async (connection) => {
                try {
                    let query = JSON.parse(msg.content.toString());
                    if(query.tipe!==undefined&&query.tipe===0){
-                       query.starttime=new Date().getTime()-100-query.antrian;
-                       console.log("data pengujian berhasil diambil");
-                       let timeAfterQueue = new Date().getTime();
-                       query.timeinqueue= (timeAfterQueue-query.starttime)/1000;
-                       console.log("memproses data pengujian "+query.tag+", antrian ke "+ query.antrian+", Start Time : " +query.starttime+", Time in Queue : "+query.timeinqueue);
-                       masukanDataPengujian(query)
+                       request({
+                           url: configs.URL_SERVICE+'absensi/time',
+                           method: "get",
+                           json: true
+                       }, function (error, response, body){
+                           if(error){
+                               console.log(error)
+                           }else {
+                               let timeAfterQueue = body.time;
+                               query.timeinqueue= (timeAfterQueue-query.starttime)/1000;
+                               console.log("memproses data pengujian "+query.tag+", antrian ke "+ query.antrian+", Start Time : " +query.starttime+", Time in Queue : "+query.timeinqueue);
+                               masukanDataPengujian(query)
+                           }
+
+                       });
                    }else {
                        console.log("-------------------------------------------------");
                        console.log('Insert Absensi');
@@ -115,13 +124,24 @@ consume2 = async (connection) => {
        await absensiModel.insertPengujian(query.tag,query.antrian,query.starttime,query.timeinqueue);
        let timeAfterSaveToDb=new Date().getTime();
        let timeForInsertToDatabase=(timeAfterSaveToDb-timeBeforeInsertToDatabase)/1000;
-       let proccessTime=(timeAfterSaveToDb-query.starttime)/1000;
-        if(query.antrian%1000===0){
-            io.emit('status', query.tag+" success saving data "+query.antrian+" to database"+", Proccess Time : " +proccessTime+", Time in Queue : "+query.timeinqueue+", Time For Saving to DB : "+timeForInsertToDatabase);
-        }else if(query.antrian<1000){
-            io.emit('status', query.tag+" success saving data "+query.antrian+" to database"+", Proccess Time : " +proccessTime+", Time in Queue : "+query.timeinqueue+", Time For Saving to DB : "+timeForInsertToDatabase);
-        }
-        await absensiModel.updateInsertToDbTime(query.tag,query.antrian,timeForInsertToDatabase,proccessTime);
+        request({
+            url: configs.URL_SERVICE+'absensi/time',
+            method: "get",
+            json: true
+        }, function (error, response, body){
+           if(error){
+               console.log(error)
+           }else {
+               let proccessTime=(body.time-query.starttime)/1000;
+               if(query.antrian%1000===0){
+                   io.emit('status', query.tag+" success saving data "+query.antrian+" to database"+", Proccess Time : " +proccessTime+", Time in Queue : "+query.timeinqueue+", Time For Saving to DB : "+timeForInsertToDatabase);
+               }else if(query.antrian<1000){
+                   io.emit('status', query.tag+" success saving data "+query.antrian+" to database"+", Proccess Time : " +proccessTime+", Time in Queue : "+query.timeinqueue+", Time For Saving to DB : "+timeForInsertToDatabase);
+               }
+               absensiModel.updateInsertToDbTime(query.tag,query.antrian,timeForInsertToDatabase,proccessTime);
+           }
+        });
+
     }catch(err) {
         console.log(err);
     }
