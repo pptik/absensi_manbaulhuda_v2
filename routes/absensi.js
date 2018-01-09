@@ -72,12 +72,16 @@ router.post('/insert', async(req, res) => {
                            res.status(200).send({success: true, message: "Data Berhasil Dikirim"});
                        }
                    }
+               }else {
+                   console.log('no user data found');
+                   req.app.io.emit('absensi', query);
                }
             }else {
                 await absensiModel.insertToListMac(query.mac);
                 await absensiModel.insertAbsensi(query);
                 query.macDetail=await absensiModel.promiseGetDetailMacID(query.mac);
                 query.detailUser=dataUser;
+                console.log('success insert data '+query);
                 req.app.io.emit('absensi', query);
                 res.status(200).send({success: true, message: "Data Berhasil Dikirim"});
             }
